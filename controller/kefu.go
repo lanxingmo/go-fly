@@ -12,7 +12,7 @@ func GetKefuInfo(c *gin.Context){
 	 info:=make(map[string]interface{})
 	 info["name"]=user.Nickname
 	info["id"]=user.Name
-	info["avator"]=user.Avator
+	info["avatar"]=user.Avatar
 	c.JSON(200, gin.H{
 		"code": 200,
 		"msg":  "ok",
@@ -32,17 +32,17 @@ func PostKefuInfo(c *gin.Context){
 	id:=c.PostForm("id")
 	name:=c.PostForm("name")
 	password:=c.PostForm("password")
-	avator:=c.PostForm("avator")
+	avatar:=c.PostForm("avatar")
 	nickname:=c.PostForm("nickname")
 	//插入新用户
 	if id==""{
-		models.CreateUser(name,tools.Md5(password),avator,nickname)
+		models.CreateUser(name,tools.Md5(password),avatar,nickname)
 	}else{
 		//更新用户
 		if password!=""{
 			password=tools.Md5(password)
 		}
-		models.UpdateUser(id,name,password,avator,nickname)
+		models.UpdateUser(id,name,password,avatar,nickname)
 	}
 
 	c.JSON(200, gin.H{

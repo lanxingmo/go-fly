@@ -19,7 +19,7 @@ func GetNotice(c *gin.Context) {
 	user:=models.FindUser(kefuId)
 	info:=make(map[string]interface{})
 	info["nickname"]=user.Nickname
-	info["avator"]=user.Avator
+	info["avatar"]=user.Avatar
 	info["name"]=user.Name
 	info["content"]=language.Notice
 	info["time"]=time.Now().Format("2006-01-02 15:04:05")

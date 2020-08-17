@@ -9,12 +9,12 @@ import (
 	"sort"
 	"time"
 )
-type vistor struct{
-	conn *websocket.Conn
-	name string
-	id string
-	avator string
-	to_id string
+type visitor struct{
+	conn   *websocket.Conn
+	name   string
+	id     string
+	avatar string
+	toID   string
 }
 type Message struct{
 	conn *websocket.Conn
@@ -22,7 +22,7 @@ type Message struct{
 	content []byte
 	messageType int
 }
-var clientList = make(map[string]*vistor)
+var clientList = make(map[string]*visitor)
 var kefuList = make(map[string][]*websocket.Conn)
 var message = make(chan *Message)
 
@@ -32,11 +32,11 @@ type TypeMessage struct {
 }
 type ClientMessage struct {
 	Name  string `json:"name"`
-	Avator   string `json:"avator"`
+	Avatar   string `json:"avatar"`
 	Id    string `json:"id"`
 	Group string `json:"group"`
 	Time     string `json:"time"`
-	ToId string `json:"to_id"`
+	ToId string `json:"toID"`
 	Content  string `json:"content"`
 	City  string `json:"city"`
 	ClientIp  string `json:"client_ip"`
@@ -63,7 +63,7 @@ func NewChatServer(c *gin.Context){
 	for {
 		//接受消息
 		var receive []byte
-		var recevString string
+		var receiveData string
 		messageType, receive, err := conn.ReadMessage()
 		if err != nil {
 			for uid,visitor :=range clientList{
@@ -79,7 +79,7 @@ func NewChatServer(c *gin.Context){
 						Data: userInfo,
 					}
 					str, _ := json.Marshal(msg)
-					kefuConns:=kefuList[visitor.to_id]
+					kefuConns:=kefuList[visitor.toID]
 					if kefuConns!=nil{
 						for _,kefuConn:=range kefuConns{
 							kefuConn.WriteMessage(websocket.TextMessage,str)
@@ -91,8 +91,8 @@ func NewChatServer(c *gin.Context){
 			log.Println(err)
 			return
 		}
-		recevString=string(receive)
-		log.Println("客户端:", recevString)
+		receiveData =string(receive)
+		log.Println("客户端:", receiveData)
 		message<-&Message{
 			conn:conn,
 			content: receive,
@@ -108,7 +108,7 @@ func SendKefuOnline(clientMsg ClientMessage, conn *websocket.Conn) {
 		Type: "kfOnline",
 		Data: ClientMessage{
 			Name:  clientMsg.Name,
-			Avator:   clientMsg.Avator,
+			Avatar:   clientMsg.Avatar,
 			Id:    clientMsg.Id,
 			Group: clientMsg.Group,
 			Time:     time.Now().Format("2006-01-02 15:04:05"),
@@ -186,8 +186,8 @@ func sendPingOnlineUsers() {
 			userInfo := make(map[string]string)
 			userInfo["uid"] = user.id
 			userInfo["username"] = user.name
-			userInfo["avator"] = user.avator
-			if user.to_id==kefuId{
+			userInfo["avatar"] = user.avatar
+			if user.toID ==kefuId{
 				result = append(result, userInfo)
 			}
 		}
@@ -231,26 +231,26 @@ func singleBroadcaster(){
 		case "userInit":
 			json.Unmarshal(msgData, &clientMsg)
 			//用户id对应的连接
-			user:=&vistor{
-				conn:conn,
-				name: clientMsg.Name,
-				avator: clientMsg.Avator,
-				id:clientMsg.Id,
-				to_id:clientMsg.ToId,
+			user:=&visitor{
+				conn:   conn,
+				name:   clientMsg.Name,
+				avatar: clientMsg.Avatar,
+				id:     clientMsg.Id,
+				toID:   clientMsg.ToId,
 			}
 			clientList[clientMsg.Id] = user
 			//插入数据表
-			models.CreateVisitor(clientMsg.Name,clientMsg.Avator,message.c.ClientIP(),clientMsg.ToId,clientMsg.Id,clientMsg.Refer,clientMsg.City,clientMsg.ClientIp)
+			models.CreateVisitor(clientMsg.Name,clientMsg.Avatar,message.c.ClientIP(),clientMsg.ToId,clientMsg.Id,clientMsg.Refer,clientMsg.City,clientMsg.ClientIp)
 			userInfo := make(map[string]string)
 			userInfo["uid"] = user.id
 			userInfo["username"] = user.name
-			userInfo["avator"] = user.avator
+			userInfo["avatar"] = user.avatar
 			msg := TypeMessage{
 				Type: "userOnline",
 				Data: userInfo,
 			}
 			str, _ := json.Marshal(msg)
-			kefuConns:=kefuList[user.to_id]
+			kefuConns:=kefuList[user.toID]
 			if kefuConns!=nil{
 				for k,kefuConn:=range kefuConns{
 					log.Println(k,"xxxxxxxx")

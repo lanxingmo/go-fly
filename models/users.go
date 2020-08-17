@@ -8,22 +8,22 @@ type User struct {
 	Name string `json:"name"`
 	Password string `json:"password"`
 	Nickname string `json:"nickname"`
-	Avator string `json:"avator"`
+	Avatar string `json:"avatar"`
 	RoleName string `json:"role_name"`
 }
-func CreateUser(name string,password string,avator string,nickname string){
+func CreateUser(name string,password string,avatar string,nickname string){
 	user:=&User{
 		Name:name,
 		Password: password,
-		Avator:avator,
+		Avatar:avatar,
 		Nickname: nickname,
 	}
 	DB.Create(user)
 }
-func UpdateUser(id string,name string,password string,avator string,nickname string){
+func UpdateUser(id string,name string,password string,avatar string,nickname string){
 	user:=&User{
 		Name:name,
-		Avator:avator,
+		Avatar:avatar,
 		Nickname: nickname,
 	}
 	if password!=""{

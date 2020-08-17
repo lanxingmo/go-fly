@@ -11,7 +11,7 @@ import (
 // @Produce  json
 // @Accept multipart/form-data
 // @Param from_id formData   string true "来源uid"
-// @Param to_id formData   string true "目标uid"
+// @Param toID formData   string true "目标uid"
 // @Param content formData   string true "内容"
 // @Param type formData   string true "类型|kefu,visitor"
 // @Success 200 {object} controller.Response
@@ -19,7 +19,7 @@ import (
 // @Router /message [post]
 func SendMessage(c *gin.Context) {
 	fromId := c.PostForm("from_id")
-	toId := c.PostForm("to_id")
+	toId := c.PostForm("toID")
 	content := c.PostForm("content")
 	cType := c.PostForm("type")
 	if content==""{
@@ -31,26 +31,26 @@ func SendMessage(c *gin.Context) {
 	}
 
 	var kefuInfo models.User
-	var vistorInfo models.Visitor
+	var visitorInfo models.Visitor
 	if cType=="kefu"{
 		kefuInfo=models.FindUser(fromId)
-		vistorInfo=models.FindVisitorByVistorId(toId)
+		visitorInfo=models.FindVisitorByVisitorId(toId)
 	}else if cType=="visitor"{
-		vistorInfo=models.FindVisitorByVistorId(fromId)
+		visitorInfo=models.FindVisitorByVisitorId(fromId)
 		kefuInfo=models.FindUser(toId)
 	}
 
-	if kefuInfo.ID==0 ||vistorInfo.ID==0{
+	if kefuInfo.ID==0 ||visitorInfo.ID==0{
 		c.JSON(200, gin.H{
 			"code": 400,
 			"msg":  "用户不存在",
 		})
 		return
 	}
-	models.CreateMessage(kefuInfo.Name,vistorInfo.VisitorId,content,cType)
+	models.CreateMessage(kefuInfo.Name,visitorInfo.VisitorId,content,cType)
 
 	if cType=="kefu"{
-		guest,ok:=clientList[vistorInfo.VisitorId]
+		guest,ok:=clientList[visitorInfo.VisitorId]
 		if guest==nil||!ok{
 			c.JSON(200, gin.H{
 				"code": 200,
@@ -64,10 +64,10 @@ func SendMessage(c *gin.Context) {
 			Type: "message",
 			Data: ClientMessage{
 				Name:  kefuInfo.Nickname,
-				Avator:   kefuInfo.Avator,
+				Avatar:   kefuInfo.Avatar,
 				Id:    kefuInfo.Name,
 				Time:     time.Now().Format("2006-01-02 15:04:05"),
-				ToId: vistorInfo.VisitorId,
+				ToId: visitorInfo.VisitorId,
 				Content:  content,
 			},
 		}
@@ -86,9 +86,9 @@ func SendMessage(c *gin.Context) {
 		msg := TypeMessage{
 			Type: "message",
 			Data: ClientMessage{
-				Avator: vistorInfo.Avator,
-				Id:     vistorInfo.VisitorId,
-				Name:   vistorInfo.Name,
+				Avatar: visitorInfo.Avatar,
+				Id:     visitorInfo.VisitorId,
+				Name:   visitorInfo.Name,
 				ToId:       kefuInfo.Name,
 				Content:    content,
 				Time:        time.Now().Format("2006-01-02 15:04:05"),

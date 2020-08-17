@@ -3,7 +3,7 @@ package models
 type Visitor struct {
 	Model
 	Name string `json:"name"`
-	Avator string `json:"avator"`
+	Avatar string `json:"avatar"`
 	SourceIp string `json:"source_ip"`
 	ToId string `json:"to_id"`
 	VisitorId string `json:"visitor_id"`
@@ -12,8 +12,8 @@ type Visitor struct {
 	City string `json:"city"`
 	ClientIp string `json:"client_ip"`
 }
-func CreateVisitor(name string,avator string,sourceIp string,toId string,visitorId string,refer string,city string,clientIp string){
-	old:=FindVisitorByVistorId(visitorId)
+func CreateVisitor(name string,avatar string,sourceIp string,toId string,visitorId string,refer string,city string,clientIp string){
+	old:=FindVisitorByVisitorId(visitorId)
 	if old.Name!=""{
 		//更新状态上线
 		UpdateVisitorStatus(visitorId,1)
@@ -21,7 +21,7 @@ func CreateVisitor(name string,avator string,sourceIp string,toId string,visitor
 	}
 	v:=&Visitor{
 		Name:name,
-		Avator: avator,
+		Avatar: avatar,
 		SourceIp:sourceIp,
 		ToId:toId,
 		VisitorId: visitorId,
@@ -32,7 +32,7 @@ func CreateVisitor(name string,avator string,sourceIp string,toId string,visitor
 	}
 	DB.Create(v)
 }
-func FindVisitorByVistorId(visitorId string)Visitor{
+func FindVisitorByVisitorId(visitorId string)Visitor{
 	var v Visitor
 	DB.Where("visitor_id = ?", visitorId).First(&v)
 	return v

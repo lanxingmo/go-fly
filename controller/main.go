@@ -20,12 +20,12 @@ func ActionMain(w http.ResponseWriter, r *http.Request) {
 }
 func MainCheckAuth(c *gin.Context) {
 	id,_:=c.Get("kefu_id")
-	userinfo:=models.FindUserRole("user.avator,user.name,user.id, role.name role_name",id)
+	userinfo:=models.FindUserRole("user.avatar,user.name,user.id, role.name role_name",id)
 	c.JSON(200, gin.H{
 		"code": 200,
 		"msg":  "验证成功",
 		"result":gin.H{
-			"avator":userinfo.Avator,
+			"avatar":userinfo.Avatar,
 			"name":userinfo.Name,
 			"role_name":userinfo.RoleName,
 		},
